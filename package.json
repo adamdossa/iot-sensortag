@@ -1,0 +1,23 @@
+{
+  "name": "iot-sensortag",
+  "version": "1.0.0",
+  "description": "IoT SensorTag",
+  "main": "streamData.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adamdossa/iot-sensortag.git"
+  },
+  "author": "Adam Dossa",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/adamdossa/iot-sensortag/issues"
+  },
+  "homepage": "https://github.com/adamdossa/iot-sensortag#readme",
+  "dependencies": {
+    "plotly": "^1.0.6",
+    "sensortag": "^1.3.0"
+  }
+}
