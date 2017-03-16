@@ -3,40 +3,60 @@ var Readable = require('stream').Readable;
 var plotly = require('plotly')('AdamAID','Xj4MtuE0NDh37URE9PlR');
 var connected = false;
 
-var data = [{x:[], y:[], z:[], stream:{token:'oab5mxhox0', maxpoints:20}, mode: "lines",
-  marker: {
-    size: 12,
-    line: {
-      color: "rgba(217, 217, 217, 0.14)",
-      width: 0.5
-    },
-    opacity: 0.8
-  },
-  type: "scatter3d"
+var data = [{y:[], x:[], stream:{token:'oab5mxhox0', maxpoints:200}, mode: "lines",
+  yaxis: "y",
+  visible: true,
+  mode: "lines",
+  xaxis: "x",
+  type: "scatter",
+  name: "x"
+}, {y:[], x:[], stream:{token:'zsh9s2bzmq', maxpoints:200}, mode: "lines",
+  yaxis: "y",
+  visible: true,
+  mode: "lines",
+  xaxis: "x",
+  type: "scatter",
+  name: "y"
+}, {y:[], x:[], stream:{token:'don4j34u6h', maxpoints:200}, mode: "lines",
+  yaxis: "y",
+  visible: true,
+  mode: "lines",
+  xaxis: "x",
+  type: "scatter",
+  name: "z"
 }];
 
 var layout = {
-  autosize: false,
-  width: 5,
-  height: 5,
-  margin: {
-    l: 0,
-    r: 0,
-    b: 0,
-    t: 0
-  }
+  autosize: true,
 };
 
-var graphOptions = {layout: layout, filename: "sensorTagLinesFixed", fileopt: "overwrite"};
+var graphOptions = {layout: layout, filename: "sensorTagLines2D1", fileopt: "overwrite"};
 
-var dataStream = new Readable;
-dataStream._read = function noop() {};
+var dataStream1 = new Readable;
+dataStream1._read = function noop() {};
+var dataStream2 = new Readable;
+dataStream2._read = function noop() {};
+var dataStream3 = new Readable;
+dataStream3._read = function noop() {};
 
-plotly.plot(data, graphOptions, function() {
-  var plotStream = plotly.stream('oab5mxhox0', function (res) {
+plotly.plot(data, graphOptions, function(err, res) {
+  if (err) return console.log("ERROR", err);
+  console.log(res);
+
+  var plotStream1 = plotly.stream('oab5mxhox0', function (res) {
     console.log(res);
   });
-  dataStream.pipe(plotStream);
+  dataStream1.pipe(plotStream1);
+
+  var plotStream2 = plotly.stream('zsh9s2bzmq', function (res) {
+    console.log(res);
+  });
+  dataStream2.pipe(plotStream2);
+
+  var plotStream3 = plotly.stream('don4j34u6h', function (res) {
+    console.log(res);
+  });
+  dataStream3.pipe(plotStream3);
 
   console.log('Make sure the SensorTag is on!');
 
@@ -62,65 +82,69 @@ plotly.plot(data, graphOptions, function() {
 
     sensorTag.on('accelerometerChange', function(x, y, z) {
       var data = {
-        "t" : counter;
+        "t" : counter,
         "x" : x,
         "y" : y,
         "z" : z
       };
+      // console.log("accelerometer: " + JSON.stringify({"x1": x, "t": counter}))
+      // console.log("accelerometer: " + JSON.stringify({"x2": y, "t": counter}))
+      // console.log("accelerometer: " + JSON.stringify({"x3": z, "t": counter}))
       counter = counter + 1;
-      console.log("accelerometer: " + JSON.stringify(data))
-      dataStream.push(JSON.stringify(data)+'\n');
+      dataStream1.push(JSON.stringify({"x": counter, "y": x})+'\n');
+      dataStream2.push(JSON.stringify({"x": counter, "y": y})+'\n');
+      dataStream3.push(JSON.stringify({"x": counter, "y": z})+'\n');
     });
 
-    sensorTag.on('magnetometerChange', function(x, y, z) {
-      var data = {
-        "x" : x,
-        "y" : y,
-        "z" : z
-      };
-      console.log("magnetometer: " + JSON.stringify(data))
-//      dataStream.push(JSON.stringify(data)+'\n');
-    });
-
-    sensorTag.on('gyroscopeChange', function(x, y, z) {
-      var data = {
-        "x" : x,
-        "y" : y,
-        "z" : z
-      };
-      console.log("gyroscopeChange" + JSON.stringify(data))
-      // dataStream.push(JSON.stringify(data)+'\n');
-    });
-
-    var previousClick = {"left" : false, "right" : false};
-    sensorTag.on('simpleKeyChange', function(left, right) {
-      var data = {
-        "d": {
-          "type": "simpleKey",
-          "left" : false,
-          "right" : false
-        }
-      };
-      if(!previousClick.left && !previousClick.right) {
-        previousClick.left = left;
-        previousClick.right = right;
-        return;
-      }
-      if(previousClick.right && previousClick.left && !left && !right) {
-        data.d.right = true;
-        data.d.left = true;
-      }
-      if(previousClick.left && !left) {
-        data.d.left = true;
-      }
-      if(previousClick.right && !right) {
-        data.d.right = true;
-      }
-
-      previousClick.left = false;
-      previousClick.right = false;
-      console.log(data);
-    });
+//     sensorTag.on('magnetometerChange', function(x, y, z) {
+//       var data = {
+//         "x" : x,
+//         "y" : y,
+//         "z" : z
+//       };
+//       console.log("magnetometer: " + JSON.stringify(data))
+// //      dataStream.push(JSON.stringify(data)+'\n');
+//     });
+//
+//     sensorTag.on('gyroscopeChange', function(x, y, z) {
+//       var data = {
+//         "x" : x,
+//         "y" : y,
+//         "z" : z
+//       };
+//       console.log("gyroscopeChange" + JSON.stringify(data))
+//       // dataStream.push(JSON.stringify(data)+'\n');
+//     });
+//
+//     var previousClick = {"left" : false, "right" : false};
+//     sensorTag.on('simpleKeyChange', function(left, right) {
+//       var data = {
+//         "d": {
+//           "type": "simpleKey",
+//           "left" : false,
+//           "right" : false
+//         }
+//       };
+//       if(!previousClick.left && !previousClick.right) {
+//         previousClick.left = left;
+//         previousClick.right = right;
+//         return;
+//       }
+//       if(previousClick.right && previousClick.left && !left && !right) {
+//         data.d.right = true;
+//         data.d.left = true;
+//       }
+//       if(previousClick.left && !left) {
+//         data.d.left = true;
+//       }
+//       if(previousClick.right && !right) {
+//         data.d.right = true;
+//       }
+//
+//       previousClick.left = false;
+//       previousClick.right = false;
+//       console.log(data);
+//     });
 
     function logDeviceInfo(err, info) {
       if (err) {
@@ -153,10 +177,10 @@ plotly.plot(data, graphOptions, function() {
       sensorTag.enableAccelerometer(logDeviceInfo);
       sensorTag.notifyAccelerometer(logDeviceInfo);
       sensorTag.setAccelerometerPeriod(100, logDeviceInfo)
-      sensorTag.enableGyroscope(logDeviceInfo);
-      sensorTag.notifyGyroscope(logDeviceInfo);
-      sensorTag.enableMagnetometer(logDeviceInfo);
-      sensorTag.notifyMagnetometer(logDeviceInfo);
+      // sensorTag.enableGyroscope(logDeviceInfo);
+      // sensorTag.notifyGyroscope(logDeviceInfo);
+      // sensorTag.enableMagnetometer(logDeviceInfo);
+      // sensorTag.notifyMagnetometer(logDeviceInfo);
     };
 
   });
