@@ -4,7 +4,7 @@ var plotly = require('plotly')('AdamAID','FY6NY09F0PC4Pitn23Jx');
 var KalmanFilter = require('kalmanjs').default;
 var connected = false;
 
-var data1 = [{y:[], x:[], stream:{token:'oab5mxhox0', maxpoints:200}, mode: "lines",
+var data = [{y:[], x:[], stream:{token:'oab5mxhox0', maxpoints:200}, mode: "lines",
   yaxis: "y",
   visible: true,
   mode: "lines",
@@ -25,10 +25,7 @@ var data1 = [{y:[], x:[], stream:{token:'oab5mxhox0', maxpoints:200}, mode: "lin
   xaxis: "x",
   type: "scatter",
   name: "z"
-},
-name='accelerometerWithKalman'];
-
-var data2 = [{y:[], x:[], stream:{token:'l6glf28ilf', maxpoints:200}, mode: "lines",
+}, {y:[], x:[], stream:{token:'l6glf28ilf', maxpoints:200}, mode: "lines",
   yaxis: "y2",
   visible: true,
   mode: "lines",
@@ -49,10 +46,7 @@ var data2 = [{y:[], x:[], stream:{token:'l6glf28ilf', maxpoints:200}, mode: "lin
   xaxis: "x2",
   type: "scatter",
   name: "z"
-},
-name='magnetometerWithKalman'];
-
-var data3 = [{y:[], x:[], stream:{token:'eqg1tt3yl1', maxpoints:200}, mode: "lines",
+}, {y:[], x:[], stream:{token:'eqg1tt3yl1', maxpoints:200}, mode: "lines",
   yaxis: "y3",
   visible: true,
   mode: "lines",
@@ -74,9 +68,7 @@ var data3 = [{y:[], x:[], stream:{token:'eqg1tt3yl1', maxpoints:200}, mode: "lin
   type: "scatter",
   name: "z"
 },
-name='gyroscopeWithKalman'];
-
-var data = [data1, data2, data3];
+name='sensorTagMotionWithKalman'];
 
 var layout = {
   yaxis: {domain: [0, 0.266]},
@@ -88,7 +80,7 @@ var layout = {
   autosize: true,
 };
 
-var graphOptions = {layout: layout, filename: "accelerometerWithKalman", fileopt: "overwrite"};
+var graphOptions = {layout: layout, filename: "sensorTagMotionWithKalman", fileopt: "overwrite"};
 
 var dataStream11 = new Readable;
 dataStream11._read = function noop() {};
@@ -122,6 +114,7 @@ plotly.plot(data, graphOptions, function(err, res) {
   if (err) return console.log("ERROR", err);
   console.log(res);
 
+  console.log("Initializing Stream1");
   var plotStream11 = plotly.stream('oab5mxhox0', function (res) {
     console.log(res);
   });
@@ -137,6 +130,7 @@ plotly.plot(data, graphOptions, function(err, res) {
   });
   dataStream31.pipe(plotStream31);
 
+  console.log("Initializing Stream2");
   var plotStream12 = plotly.stream('l6glf28ilf', function (res) {
     console.log(res);
   });
@@ -152,6 +146,7 @@ plotly.plot(data, graphOptions, function(err, res) {
   });
   dataStream32.pipe(plotStream32);
 
+  console.log("Initializing Stream3");
   var plotStream13 = plotly.stream('eqg1tt3yl1', function (res) {
     console.log(res);
   });
@@ -239,9 +234,9 @@ plotly.plot(data, graphOptions, function(err, res) {
       console.log("gyroscope: " + JSON.stringify({"x2": y, "t": counterGyro}))
       console.log("gyroscope: " + JSON.stringify({"x3": z, "t": counterGyro}))
       counterGyro = counterGyro + 1;
-      dataStream12.push(JSON.stringify({"x": counterGyro, "y": kf13.filter(x)})+'\n');
-      dataStream22.push(JSON.stringify({"x": counterGyro, "y": kf23.filter(y)})+'\n');
-      dataStream32.push(JSON.stringify({"x": counterGyro, "y": kf33.filter(z)})+'\n');
+      dataStream13.push(JSON.stringify({"x": counterGyro, "y": kf13.filter(x)})+'\n');
+      dataStream23.push(JSON.stringify({"x": counterGyro, "y": kf23.filter(y)})+'\n');
+      dataStream33.push(JSON.stringify({"x": counterGyro, "y": kf33.filter(z)})+'\n');
     });
 //
 //     var previousClick = {"left" : false, "right" : false};
